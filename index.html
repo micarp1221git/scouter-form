@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>マーケター戦闘力スカウター</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+      padding: 24px 0;
+      border-bottom: 2px solid #00BF63;
+    }
+    .header h1 {
+      font-size: 22px;
+      color: #00BF63;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+    .header p { font-size: 15px; color: #aaa; }
+
+    .section { margin-bottom: 24px; }
+    .section-label {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #ddd;
+    }
+    .section-label .required {
+      color: #ff6b6b;
+      font-size: 12px;
+      margin-left: 4px;
+    }
+    .section-hint { font-size: 12px; color: #888; margin-bottom: 6px; }
+
+    input[type="text"],
+    input[type="email"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: #00BF63; }
+
+    .checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 12px;
+      background: #1a1a1a;
+      border-radius: 8px;
+      border: 1px solid #333;
+    }
+    .checkbox-group input[type="checkbox"] {
+      margin-top: 3px;
+      accent-color: #00BF63;
+      width: 18px;
+      height: 18px;
+    }
+    .checkbox-group label { font-size: 13px; color: #bbb; line-height: 1.5; }
+
+    .recorder-box {
+      border: 2px dashed #333;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      background: #111;
+    }
+    .recorder-box.has-audio { border-color: #00BF63; border-style: solid; }
+
+    .btn-record {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 50px;
+      background: #00BF63;
+      color: #000;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-record:hover { background: #00d46f; }
+    .btn-record.recording {
+      background: #ff4444;
+      color: #fff;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+    .timer {
+      font-size: 32px;
+      font-weight: bold;
+      color: #ff4444;
+      margin: 16px 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .audio-preview { margin-top: 16px; }
+    .audio-preview audio { width: 100%; height: 40px; }
+    .audio-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      justify-content: center;
+    }
+    .btn-retry {
+      padding: 8px 20px;
+      border: 1px solid #666;
+      border-radius: 6px;
+      background: transparent;
+      color: #ccc;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-retry:hover { border-color: #aaa; color: #fff; }
+
+    .upload-area { margin-top: 16px; padding-top: 16px; border-top: 1px solid #333; }
+    .upload-area label { font-size: 13px; color: #888; }
+    .file-input-wrapper { margin-top: 8px; }
+    .file-input-wrapper input[type="file"] { font-size: 14px; color: #aaa; }
+
+    .btn-submit {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #00BF63;
+      color: #000;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 32px;
+    }
+    .btn-submit:hover { background: #00d46f; }
+    .btn-submit:disabled { background: #333; color: #666; cursor: not-allowed; }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .overlay.active { display: flex; }
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #333;
+      border-top-color: #00BF63;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .overlay-text { margin-top: 16px; font-size: 16px; color: #ccc; }
+
+    .complete-screen {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .complete-screen.active { display: block; }
+    .complete-icon { font-size: 64px; margin-bottom: 16px; }
+    .complete-screen h2 { font-size: 20px; color: #00BF63; margin-bottom: 12px; }
+    .complete-screen p { font-size: 14px; color: #aaa; }
+
+    .error-msg { color: #ff6b6b; font-size: 13px; margin-top: 4px; display: none; }
+
+    .info-box {
+      padding: 16px;
+      background: #1a1a1a;
+      border-radius: 8px;
+      border-left: 3px solid #00BF63;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: #bbb;
+      line-height: 1.8;
+    }
+
+    .privacy-box {
+      padding: 12px;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 8px;
+      font-size: 11px;
+      color: #888;
+      line-height: 1.6;
+      max-height: 160px;
+      overflow-y: auto;
+      margin-bottom: 8px;
+    }
+
+    .notice-box {
+      padding: 16px;
+      background: #1a1a1a;
+      border-radius: 8px;
+      border: 1px solid #333;
+      font-size: 13px;
+      color: #aaa;
+      line-height: 1.6;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container" id="formScreen">
+  <div class="header">
+    <h1>マーケター戦闘力スカウター</h1>
+    <p>あなたの声のマーケター戦闘力をはかります</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">メールアドレス<span class="required">*必須</span></div>
+    <div class="checkbox-group" style="margin-bottom: 8px;">
+      <input type="checkbox" id="newsletter" checked>
+      <label for="newsletter">メールマガジンへのご登録をお願いいたします（不要な場合はかんたんに解除できます）。声に役立つ内容や講座クーポンなどの情報を優先的にお届けします。</label>
+    </div>
+    <input type="email" id="email" placeholder="example@email.com">
+    <div class="error-msg" id="emailError">メールアドレスを入力してください</div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">お名前（声カルテに記載されます）<span class="required">*必須</span></div>
+    <div class="section-hint">ハンドルネームでOK</div>
+    <input type="text" id="name" placeholder="お名前を入力">
+    <div class="error-msg" id="nameError">お名前を入力してください</div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">性別：音声分析で使用（診断文には非表示）<span class="required">*必須</span></div>
+    <select id="gender">
+      <option value="">選択してください</option>
+      <option value="男性">男性</option>
+      <option value="女性">女性</option>
+      <option value="回答しない">回答しない</option>
+    </select>
+    <div class="error-msg" id="genderError">性別を選択してください</div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">ご希望の回答スタイルを教えてください<span class="required">*必須</span></div>
+    <select id="tone">
+      <option value="">選択してください</option>
+      <option value="辛口">辛口</option>
+      <option value="普通" selected>普通</option>
+      <option value="甘口">甘口</option>
+    </select>
+    <div class="error-msg" id="toneError">回答スタイルを選択してください</div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">声を使う場面<span class="required">*必須</span></div>
+    <input type="text" id="scene" placeholder="例：配信、営業、ナレーション、接客 など">
+    <div class="error-msg" id="sceneError">声を使う場面を入力してください</div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">InstagramのユーザーID</div>
+    <div class="section-hint">「名前」ではなく「ユーザー名」を入力。コピー＆ペースト推奨。</div>
+    <input type="text" id="instagramId" placeholder="@voice_mika123">
+  </div>
+
+  <div class="section">
+    <div class="section-label">XのユーザーID</div>
+    <div class="section-hint">「名前」ではなく「ユーザー名」を入力。コピー＆ペースト推奨。</div>
+    <input type="text" id="xId" placeholder="@micarp">
+  </div>
+
+  <div class="section">
+    <div class="section-label">投稿時にメンションしてほしいSNS<span class="required">*必須</span></div>
+    <select id="mention">
+      <option value="">選択してください</option>
+      <option value="Instagram">Instagram</option>
+      <option value="X">X</option>
+      <option value="両方">両方</option>
+      <option value="しない">しない</option>
+    </select>
+    <div class="error-msg" id="mentionError">選択してください</div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">音声を送信してください（最大3分）<span class="required">*必須</span></div>
+    <div class="info-box">
+      以下の文章を読み上げてください：<br>
+      <strong style="color:#00BF63; font-size: 15px;">「日本の田舎は資本主義のフロンティアだ」</strong><br><br>
+      ・環境音やBGM、ノイズが多いと分析精度が下がります。<br>
+      ・静かな場所で録音してください。
+    </div>
+
+    <div class="recorder-box" id="recorderBox">
+      <div id="stateIdle">
+        <button class="btn-record" id="btnRecord" onclick="startRecording()">
+          🎙 録音を開始する
+        </button>
+        <div class="upload-area">
+          <label>または、録音済みの音声ファイルをアップロード</label>
+          <div class="file-input-wrapper">
+            <input type="file" id="fileInput" accept="audio/*,.m4a,.mp3,.wav,.webm,.mp4,.ogg" onchange="handleFileUpload(event)">
+          </div>
+          <div class="section-hint">対応形式：m4a, mp3, wav, webm, mp4, ogg</div>
+        </div>
+      </div>
+
+      <div id="stateRecording" style="display:none;">
+        <div class="timer" id="timer">3:00</div>
+        <div style="font-size:14px; color:#ff4444; margin-bottom:12px;">録音中...</div>
+        <button class="btn-record recording" onclick="stopRecording()">
+          ⏹ 録音を停止する
+        </button>
+      </div>
+
+      <div id="statePreview" style="display:none;">
+        <div class="audio-preview">
+          <audio id="audioPlayer" controls></audio>
+        </div>
+        <div class="audio-actions">
+          <button class="btn-retry" onclick="retryRecording()">もう一度録音</button>
+        </div>
+      </div>
+    </div>
+    <div class="error-msg" id="audioError">音声を録音またはアップロードしてください</div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">個人情報と音声等の取り扱いについて</div>
+    <div class="privacy-box">
+      <strong>個人情報の利用目的</strong><br>
+      ・フォーム結果を、新商品や新サービスの開発、顧客満足向上のヒントにするため<br>
+      ・DM、電子メールにて、新商品や新サービス、イベントやキャンペーンをご案内するため<br>
+      ・お問い合わせに対する回答など、業務上の連絡を取るため<br><br>
+      <strong>個人情報の取り扱い</strong><br>
+      ・ご記入いただいた個人情報につきましては、紛失や漏洩が発生しないように努めます。<br>
+      ・ご記入いただいた個人情報は、上記の利用目的のみに使用し、第三者に提供することはございません。
+    </div>
+    <div class="checkbox-group">
+      <input type="checkbox" id="consent">
+      <label for="consent">同意する<span style="color:#ff6b6b;">*必須</span></label>
+    </div>
+    <div class="error-msg" id="consentError">同意が必要です</div>
+  </div>
+
+  <button class="btn-submit" id="btnSubmit" onclick="submitForm()">送信する</button>
+
+  <div class="notice-box">
+    📢 回答まで時間がかかる場合があります。分析完了後、メンションにてお知らせします！<br>
+    基本的に平日の日中にお返ししていますが、土日祝は回答できない場合があります。<br><br>
+    【もし届かない時は…】メンションエラー等かもしれません。私のタイムラインを覗いてみてください。
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="spinner"></div>
+  <div class="overlay-text">送信中です...</div>
+</div>
+
+<div class="container complete-screen" id="completeScreen">
+  <div class="complete-icon">✅</div>
+  <h2>送信が完了しました！</h2>
+  <p>分析完了後、SNSにてメンションいたします。<br>しばらくお待ちください。</p>
+</div>
+
+<script>
+// ========================================
+// ★★★ デプロイ後にここにGAS URLを貼り付け ★★★
+// ========================================
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbylNQHZw82zsBead8AeQ944_NLyHwcD2h1Gy-3H-Gktg7w1EkCU1HsT7Epns6b2dejV6g/exec';
+
+var MAX_RECORD_SEC = 180;
+var mediaRecorder = null;
+var audioChunks = [];
+var audioBlob = null;
+var audioMimeType = '';
+var timerInterval = null;
+var recordSeconds = 0;
+
+// ===== 録音 =====
+
+function startRecording() {
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(function(stream) {
+      audioChunks = [];
+      var mimeOptions = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'];
+      var selectedMime = '';
+      for (var i = 0; i < mimeOptions.length; i++) {
+        if (MediaRecorder.isTypeSupported(mimeOptions[i])) {
+          selectedMime = mimeOptions[i];
+          break;
+        }
+      }
+      var options = selectedMime ? { mimeType: selectedMime } : {};
+      mediaRecorder = new MediaRecorder(stream, options);
+      audioMimeType = mediaRecorder.mimeType;
+
+      mediaRecorder.ondataavailable = function(e) {
+        if (e.data.size > 0) audioChunks.push(e.data);
+      };
+      mediaRecorder.onstop = function() {
+        stream.getTracks().forEach(function(t) { t.stop(); });
+        audioBlob = new Blob(audioChunks, { type: audioMimeType });
+        showPreview();
+      };
+      mediaRecorder.start(1000);
+
+      document.getElementById('stateIdle').style.display = 'none';
+      document.getElementById('stateRecording').style.display = 'block';
+      document.getElementById('statePreview').style.display = 'none';
+
+      recordSeconds = 0;
+      updateTimer();
+      timerInterval = setInterval(function() {
+        recordSeconds++;
+        updateTimer();
+        if (recordSeconds >= MAX_RECORD_SEC) stopRecording();
+      }, 1000);
+    })
+    .catch(function() {
+      alert('マイクへのアクセスが許可されませんでした。\nブラウザの設定でマイクを許可してください。');
+    });
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') mediaRecorder.stop();
+  clearInterval(timerInterval);
+}
+
+function updateTimer() {
+  var remaining = MAX_RECORD_SEC - recordSeconds;
+  var m = Math.floor(remaining / 60);
+  var s = remaining % 60;
+  document.getElementById('timer').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function showPreview() {
+  document.getElementById('stateIdle').style.display = 'none';
+  document.getElementById('stateRecording').style.display = 'none';
+  document.getElementById('statePreview').style.display = 'block';
+  document.getElementById('recorderBox').classList.add('has-audio');
+  document.getElementById('audioPlayer').src = URL.createObjectURL(audioBlob);
+  document.getElementById('audioError').style.display = 'none';
+}
+
+function retryRecording() {
+  audioBlob = null;
+  audioMimeType = '';
+  document.getElementById('stateIdle').style.display = 'block';
+  document.getElementById('stateRecording').style.display = 'none';
+  document.getElementById('statePreview').style.display = 'none';
+  document.getElementById('recorderBox').classList.remove('has-audio');
+  document.getElementById('fileInput').value = '';
+}
+
+// ===== ファイルアップロード =====
+
+function handleFileUpload(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) {
+    alert('ファイルサイズが大きすぎます（最大10MB）');
+    e.target.value = '';
+    return;
+  }
+  audioMimeType = file.type || 'audio/webm';
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    audioBlob = new Blob([ev.target.result], { type: audioMimeType });
+    showPreview();
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ===== バリデーション =====
+
+function validate() {
+  var valid = true;
+  var checks = [
+    { id: 'email', errorId: 'emailError', test: function(v) { return v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); } },
+    { id: 'name', errorId: 'nameError', test: function(v) { return !!v; } },
+    { id: 'gender', errorId: 'genderError', test: function(v) { return !!v; } },
+    { id: 'tone', errorId: 'toneError', test: function(v) { return !!v; } },
+    { id: 'scene', errorId: 'sceneError', test: function(v) { return !!v; } },
+    { id: 'mention', errorId: 'mentionError', test: function(v) { return !!v; } }
+  ];
+  checks.forEach(function(c) {
+    var val = document.getElementById(c.id).value.trim();
+    if (!c.test(val)) {
+      document.getElementById(c.errorId).style.display = 'block';
+      valid = false;
+    } else {
+      document.getElementById(c.errorId).style.display = 'none';
+    }
+  });
+  if (!audioBlob) {
+    document.getElementById('audioError').style.display = 'block';
+    valid = false;
+  } else {
+    document.getElementById('audioError').style.display = 'none';
+  }
+  if (!document.getElementById('consent').checked) {
+    document.getElementById('consentError').style.display = 'block';
+    valid = false;
+  } else {
+    document.getElementById('consentError').style.display = 'none';
+  }
+  return valid;
+}
+
+// ===== 送信 =====
+
+function submitForm() {
+  if (!validate()) {
+    var firstError = document.querySelector('.error-msg[style*="block"]');
+    if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  document.getElementById('overlay').classList.add('active');
+  document.getElementById('btnSubmit').disabled = true;
+
+  var reader = new FileReader();
+  reader.onload = function() {
+    var base64 = btoa(
+      new Uint8Array(reader.result).reduce(function(data, byte) {
+        return data + String.fromCharCode(byte);
+      }, '')
+    );
+
+    var payload = {
+      name: document.getElementById('name').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      gender: document.getElementById('gender').value,
+      tone: document.getElementById('tone').value,
+      scene: document.getElementById('scene').value.trim(),
+      instagramId: document.getElementById('instagramId').value.trim(),
+      xId: document.getElementById('xId').value.trim(),
+      mention: document.getElementById('mention').value,
+      audioData: base64,
+      mimeType: audioMimeType
+    };
+
+    fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(result) {
+      document.getElementById('overlay').classList.remove('active');
+      if (result.success) {
+        document.getElementById('formScreen').style.display = 'none';
+        document.getElementById('completeScreen').classList.add('active');
+        window.scrollTo(0, 0);
+      } else {
+        alert('送信エラー: ' + (result.message || '不明なエラー'));
+        document.getElementById('btnSubmit').disabled = false;
+      }
+    })
+    .catch(function(err) {
+      document.getElementById('overlay').classList.remove('active');
+      alert('送信に失敗しました: ' + err.message);
+      document.getElementById('btnSubmit').disabled = false;
+    });
+  };
+  reader.readAsArrayBuffer(audioBlob);
+}
+</script>
+
+</body>
+</html>
