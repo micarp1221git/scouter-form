@@ -280,7 +280,7 @@
   </div>
 
   <div class="section">
-    <div class="section-label">声を使う場面<span class="required">*必須</span></div>
+    <div class="section-label">声を使う場面</div>
     <input type="text" id="scene" placeholder="例：配信、営業、ナレーション、接客 など">
     <div class="error-msg" id="sceneError">声を使う場面を入力してください</div>
   </div>
@@ -506,7 +506,6 @@ function validate() {
     { id: 'name', errorId: 'nameError', test: function(v) { return !!v; } },
     { id: 'gender', errorId: 'genderError', test: function(v) { return !!v; } },
     { id: 'tone', errorId: 'toneError', test: function(v) { return !!v; } },
-    { id: 'scene', errorId: 'sceneError', test: function(v) { return !!v; } },
     { id: 'mention', errorId: 'mentionError', test: function(v) { return !!v; } }
   ];
   checks.forEach(function(c) {
