@@ -286,26 +286,9 @@
   </div>
 
   <div class="section">
-    <div class="section-label">InstagramのユーザーID</div>
-    <div class="section-hint">「名前」ではなく「ユーザー名」を入力。コピー＆ペースト推奨。</div>
-    <input type="text" id="instagramId" placeholder="@voice_mika123">
-  </div>
-
-  <div class="section">
     <div class="section-label">XのユーザーID</div>
-    <div class="section-hint">「名前」ではなく「ユーザー名」を入力。コピー＆ペースト推奨。</div>
+    <div class="section-hint">「名前」ではなく「ユーザー名」を入力。コピー＆ペースト推奨。<br>このIDにメンションでお知らせします。</div>
     <input type="text" id="xId" placeholder="@micarp">
-  </div>
-
-  <div class="section">
-    <div class="section-label">投稿時にメンションしてほしいSNS<span class="required">*必須</span></div>
-    <select id="mention">
-      <option value="">選択してください</option>
-      <option value="Instagram">Instagram</option>
-      <option value="X">X</option>
-      <option value="両方">両方</option>
-    </select>
-    <div class="error-msg" id="mentionError">選択してください</div>
   </div>
 
   <div class="section">
@@ -385,7 +368,7 @@
 <div class="container complete-screen" id="completeScreen">
   <div class="complete-icon">✅</div>
   <h2>送信が完了しました！</h2>
-  <p>分析完了後、SNSにてメンションいたします。<br>しばらくお待ちください。</p>
+  <p>分析完了後、Xにてメンションいたします。<br>しばらくお待ちください。</p>
 </div>
 
 <script>
@@ -505,8 +488,7 @@ function validate() {
     { id: 'email', errorId: 'emailError', test: function(v) { return v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); } },
     { id: 'name', errorId: 'nameError', test: function(v) { return !!v; } },
     { id: 'gender', errorId: 'genderError', test: function(v) { return !!v; } },
-    { id: 'tone', errorId: 'toneError', test: function(v) { return !!v; } },
-    { id: 'mention', errorId: 'mentionError', test: function(v) { return !!v; } }
+    { id: 'tone', errorId: 'toneError', test: function(v) { return !!v; } }
   ];
   checks.forEach(function(c) {
     var val = document.getElementById(c.id).value.trim();
@@ -558,9 +540,7 @@ function submitForm() {
       gender: document.getElementById('gender').value,
       tone: document.getElementById('tone').value,
       scene: document.getElementById('scene').value.trim(),
-      instagramId: document.getElementById('instagramId').value.trim(),
       xId: document.getElementById('xId').value.trim(),
-      mention: document.getElementById('mention').value,
       audioData: base64,
       mimeType: audioMimeType
     };
