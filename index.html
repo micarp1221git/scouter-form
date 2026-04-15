@@ -241,31 +241,10 @@
   </div>
 
   <div class="section">
-    <div class="section-label">メールアドレス<span class="required">*必須</span></div>
-    <div class="checkbox-group" style="margin-bottom: 8px;">
-      <input type="checkbox" id="newsletter" checked>
-      <label for="newsletter">メールマガジンへのご登録をお願いいたします。<br>※不要な場合はかんたんに解除できます<br>声に役立つ内容や講座クーポンなどの情報を優先的にお届けします。</label>
-    </div>
-    <input type="email" id="email" placeholder="example@email.com">
-    <div class="error-msg" id="emailError">メールアドレスを入力してください</div>
-  </div>
-
-  <div class="section">
     <div class="section-label">お名前（スカウターに表記されます）<span class="required">*必須</span></div>
     <div class="section-hint">ハンドルネームでOK</div>
     <input type="text" id="name" placeholder="お名前を入力">
     <div class="error-msg" id="nameError">お名前を入力してください</div>
-  </div>
-
-  <div class="section">
-    <div class="section-label">性別：音声分析で使用（診断文には非表示）<span class="required">*必須</span></div>
-    <select id="gender">
-      <option value="">選択してください</option>
-      <option value="男性">男性</option>
-      <option value="女性">女性</option>
-      <option value="回答しない">回答しない</option>
-    </select>
-    <div class="error-msg" id="genderError">性別を選択してください</div>
   </div>
 
   <div class="section">
@@ -277,12 +256,6 @@
       <option value="甘口">甘口</option>
     </select>
     <div class="error-msg" id="toneError">回答スタイルを選択してください</div>
-  </div>
-
-  <div class="section">
-    <div class="section-label">声を使う場面</div>
-    <input type="text" id="scene" placeholder="例：配信、営業、ナレーション、接客 など">
-    <div class="error-msg" id="sceneError">声を使う場面を入力してください</div>
   </div>
 
   <div class="section">
@@ -331,24 +304,6 @@
       </div>
     </div>
     <div class="error-msg" id="audioError">音声を録音またはアップロードしてください</div>
-  </div>
-
-  <div class="section">
-    <div class="section-label">個人情報と音声等の取り扱いについて</div>
-    <div class="privacy-box">
-      <strong>個人情報の利用目的</strong><br>
-      ・フォーム結果を、新商品や新サービスの開発、顧客満足向上のヒントにするため<br>
-      ・DM、電子メールにて、新商品や新サービス、イベントやキャンペーンをご案内するため<br>
-      ・お問い合わせに対する回答など、業務上の連絡を取るため<br><br>
-      <strong>個人情報の取り扱い</strong><br>
-      ・ご記入いただいた個人情報につきましては、紛失や漏洩が発生しないように努めます。<br>
-      ・ご記入いただいた個人情報は、上記の利用目的のみに使用し、第三者に提供することはございません。
-    </div>
-    <div class="checkbox-group">
-      <input type="checkbox" id="consent">
-      <label for="consent">同意する<span style="color:#ff6b6b;">*必須</span></label>
-    </div>
-    <div class="error-msg" id="consentError">同意が必要です</div>
   </div>
 
   <button class="btn-submit" id="btnSubmit" onclick="submitForm()">送信する</button>
@@ -485,9 +440,7 @@ function handleFileUpload(e) {
 function validate() {
   var valid = true;
   var checks = [
-    { id: 'email', errorId: 'emailError', test: function(v) { return v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); } },
     { id: 'name', errorId: 'nameError', test: function(v) { return !!v; } },
-    { id: 'gender', errorId: 'genderError', test: function(v) { return !!v; } },
     { id: 'tone', errorId: 'toneError', test: function(v) { return !!v; } }
   ];
   checks.forEach(function(c) {
@@ -504,12 +457,6 @@ function validate() {
     valid = false;
   } else {
     document.getElementById('audioError').style.display = 'none';
-  }
-  if (!document.getElementById('consent').checked) {
-    document.getElementById('consentError').style.display = 'block';
-    valid = false;
-  } else {
-    document.getElementById('consentError').style.display = 'none';
   }
   return valid;
 }
@@ -536,10 +483,7 @@ function submitForm() {
 
     var payload = {
       name: document.getElementById('name').value.trim(),
-      email: document.getElementById('email').value.trim(),
-      gender: document.getElementById('gender').value,
       tone: document.getElementById('tone').value,
-      scene: document.getElementById('scene').value.trim(),
       xId: document.getElementById('xId').value.trim(),
       audioData: base64,
       mimeType: audioMimeType
