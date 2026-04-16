@@ -259,9 +259,10 @@
   </div>
 
   <div class="section">
-    <div class="section-label">XのユーザーID</div>
+    <div class="section-label">XのユーザーID<span class="required">*必須</span></div>
     <div class="section-hint">「名前」ではなく「ユーザー名」を入力。コピー＆ペースト推奨。<br>このIDにメンションでお知らせします。</div>
     <input type="text" id="xId" placeholder="@micarp">
+    <div class="error-msg" id="xIdError">XのユーザーIDを入力してください</div>
   </div>
 
   <div class="section">
@@ -441,7 +442,8 @@ function validate() {
   var valid = true;
   var checks = [
     { id: 'name', errorId: 'nameError', test: function(v) { return !!v; } },
-    { id: 'tone', errorId: 'toneError', test: function(v) { return !!v; } }
+    { id: 'tone', errorId: 'toneError', test: function(v) { return !!v; } },
+    { id: 'xId', errorId: 'xIdError', test: function(v) { return !!v; } }
   ];
   checks.forEach(function(c) {
     var val = document.getElementById(c.id).value.trim();
